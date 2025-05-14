@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>OpenLayers: Polygon zeichnen</title>
+  <link rel="stylesheet" href="https://cdn.skypack.dev/ol/ol.css">
+  <style>
+    html, body, #map {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+
+  <script type="module">
+    import Map from 'https://cdn.skypack.dev/ol/Map';
+    import View from 'https://cdn.skypack.dev/ol/View';
+    import TileLayer from 'https://cdn.skypack.dev/ol/layer/Tile';
+    import VectorLayer from 'https://cdn.skypack.dev/ol/layer/Vector';
+    import VectorSource from 'https://cdn.skypack.dev/ol/source/Vector';
+    import OSM from 'https://cdn.skypack.dev/ol/source/OSM';
+    import Draw from 'https://cdn.skypack.dev/ol/interaction/Draw';
+    import {fromLonLat} from 'https://cdn.skypack.dev/ol/proj';
+
+    // Vektorquelle für gezeichnete Objekte
+    const drawSource = new VectorSource();
+
+    const drawLayer = new VectorLayer({
+      source: drawSource
+    });
+
+    // Karte
+    const map = new Map({
+      target: 'map',
+      layers: [
+        new TileLayer({
+          source: new OSM()
+        }),
+        drawLayer
+      ],
+      view: new View({
+        center: fromLonLat([13.41, 52.52]), // Berlin
+        zoom: 14
+      })
+    });
+
+    // Interaktion: Polygon zeichnen
+    const draw = new Draw({
+      source: drawSource,
+      type: 'Polygon'
+    });
+
+    map.addInteraction(draw);
+
+    // Optional: Event, wenn Polygon fertig ist
+    draw.on('drawend', (event) => {
+      console.log('Polygon gezeichnet:', event.feature.getGeometry().getCoordinates());
+    });
+  </script>
+</body>
+</html>
